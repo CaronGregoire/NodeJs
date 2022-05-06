@@ -17,10 +17,22 @@ exports.modifyThing = (req, res, next) => {
 }
 
 exports.deleteThing = (req, res, next) => {
+    Thing.findOne({_id: req.param.id}) .then(
+        (thing) => {
+            if (!thing) {
+                res.status(404).json({
+                    error: new Error('objet non trouvé')
+                });
+            }
+            if (thing.userId !== req.auth.userId) {
+                res.status(401).json({
+                    error: new Error('Requete non authorisée!')
+                });
+            }
     Thing.deleteOne({ _id: req.params.id })
         .then(() => res.status(200).json({ message: 'Objet supprimé !' }))
         .catch(error => res.status(400).json({ error }));
-}
+    })};
 
 exports.getOneThing = (req, res, next) => {
     Thing.findOne({ _id: req.params.id })
